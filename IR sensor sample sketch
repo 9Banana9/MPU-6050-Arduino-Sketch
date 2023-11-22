@@ -1,24 +1,112 @@
-int IRSensor = 9; // connect IR sensor module to Arduino pin D9
-int LED = 13; // connect LED to Arduino pin 13
+#include <LiquidCrystal.h>
 
-void setup(){
-  Serial.begin(115200); // Init Serial at 115200 Baud Rate.
-  Serial.println("Serial Working"); // Test to check if serial is working or not
-  pinMode(IRSensor, INPUT); // IR Sensor pin INPUT
-  pinMode(LED, OUTPUT); // LED Pin Output
+const int rs = 8, en = 9, d4 = 4, d5 = 5, d6 = 6, d7 = 7;
+LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
+
+int IN1 = A2;
+int IN2 = A3;
+int IN3 = A4;
+int IN4 = A5;
+int LIR = 12;
+int RIR = 13;
+int LEnc = 2;
+int REnc = 3;
+
+void setup() {
+
+  Serial.begin(9600);
+
+  // set up the LCD's number of columns and rows:
+  lcd.begin(16, 2);
+  // Print a message to the LCD.
+  lcd.print("hello, world!");
+ 
+  // Set the output pins
+  pinMode(IN1, OUTPUT);
+  pinMode(IN2, OUTPUT);
+  pinMode(IN3, OUTPUT);
+  pinMode(IN4, OUTPUT);
+  pinMode(LIR,INPUT);
+  pinMode(RIR,INPUT);
+  pinMode(LEnc,INPUT);
+  pinMode(REnc,INPUT);
+
+  //setup interrupt for encoders
+  attachInterrupt(digitalPinToInterrupt(LEnc),distCount,FALLING);
+  attachInterrupt(digitalPinToInterrupt(REnc),distCount2,FALLING);
+}
+ 
+
+
+void loop() {
+  /*
+  // set the cursor to column 0, line 1
+  // (note: line 1 is the second row, since counting begins with 0):
+  lcd.setCursor(0, 1);
+  // print the number of seconds since reset:
+  lcd.print(millis() / 2000);*/
+/*
+  int LIRStat = digitalRead(LIR);
+  int RIRStat = digitalRead(LIR);
+  Serial.print("Left Value : ");
+  Serial.println(LIRStat);
+  Serial.print("Right Value: ");
+  Serial.println(RIRStat);
+
+  if (LIRStat == 1)
+  {
+  digitalWrite(IN1, HIGH);
+  digitalWrite(IN2, LOW);
+  digitalWrite(IN3, HIGH);
+  digitalWrite(IN4, LOW);
+  }
+
+  if (RIRStat == 1)
+  {
+  digitalWrite(IN1, LOW);
+  digitalWrite(IN2, LOW);
+  digitalWrite(IN3, LOW);
+  digitalWrite(IN4, LOW);
+  }
+
+  else
+  {
+  digitalWrite(IN1, LOW);
+  digitalWrite(IN2, LOW);
+  digitalWrite(IN3, LOW);
+  digitalWrite(IN4, LOW);
+  }*/
+
+  int LEncStat=digitalRead(LEnc);
+  int REncStat=digitalRead(REnc);
+
+  int REncCount;
+  Serial.print("LEncStat : ");
+  Serial.println(LEncStat);
+  //Serial.print("REncStat : ");
+  //Serial.println(REncStat);
+
+
+  delay(600);
 }
 
-void loop(){
-  int sensorStatus = digitalRead(IRSensor); // Set the GPIO as Input
-  if (sensorStatus == 1) // Check if the pin high or not
-  {
-    // if the pin is high turn off the onboard Led
-    digitalWrite(LED, LOW); // LED LOW
-    Serial.println("Motion Detected!"); // print Motion Detected! on the serial monitor window
-  }
-  else  {
-    //else turn on the onboard LED
-    digitalWrite(LED, HIGH); // LED High
-    Serial.println("Motion Ended!"); // print Motion Ended! on the serial monitor window
-  }
+
+/////////////Interrupts///////////////
+int LEncCount=0;
+void distCount()
+{
+  LEncCount++;
+  Serial.print("Count : ");
+  Serial.println(LEncCount);
+  float d=(LEncCount/20.0)*20.7345;
+  
+  Serial.print("Distance: ");
+  Serial.print(d);
+  Serial.println("cm");
+}
+
+void distCount2()
+{
+  int REncCount=0;
+  REncCount++;
 }
